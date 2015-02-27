@@ -7,11 +7,14 @@ const int rightMotorCtrlPin1 = 8;
 const int rightMotorCtrlPin2 = 12;
 const int rightMotorEnablePin = 5;
 
+//left A3
+//right A2
 const int leftSensorPin = A4;
 const int rightSensorPin = A5;
 
 const int leftLED = 11;
 const int rightLED = 10;
+const int turnLED = 9;
 
 // initialize global variables
 int maxLeft = 0;
@@ -19,9 +22,9 @@ int minLeft = 1023;
 int maxRight = 0;
 int minRight = 1023;
 
-const int SLOWSPEED = 50;
-const int FASTSPEED = 110;
-const int NORMALSPEED = 80;
+const int SLOWSPEED = 100;
+const int FASTSPEED = 255;
+const int NORMALSPEED = 255;
 
 void setup() {
   
@@ -38,6 +41,8 @@ void setup() {
   pinMode(rightMotorCtrlPin2, OUTPUT);
   pinMode(rightMotorEnablePin, OUTPUT);
   
+  pinMode(turnLED, OUTPUT);
+  
   calibrate();
   
   analogWrite(leftMotorEnablePin, NORMALSPEED);
@@ -49,7 +54,7 @@ void calibrate() {
   int time = millis(); 
   int leftSensor, rightSensor;
   
-  while ((millis() - time) < 5000) {
+  while ((millis() - time) < 3000) {
     leftSensor = analogRead(leftSensorPin);
     rightSensor = analogRead(rightSensorPin);
     Serial.print(leftSensor);
@@ -79,7 +84,7 @@ void calibrate() {
   // LEDs indicate calibration is done
   digitalWrite(leftLED, HIGH);
   digitalWrite(rightLED, HIGH);
-  delay(4000);
+  delay(2000);
   digitalWrite(leftLED, LOW);
   digitalWrite(rightLED, LOW);
   
@@ -87,18 +92,12 @@ void calibrate() {
 }
 
 // get sensor readings and make adjustment decisions
-char CheckSensors() {
+int CheckSensors() {
   
   int time;
   int leftSensor = analogRead(leftSensorPin);
   int rightSensor = analogRead(rightSensorPin);
  
-  // take average value of sensor in 0.01s to make the result more accurate
-  /*time = millis();
-  while ((millis()-time) < 10) {
-    leftSensor = (leftSensor + analogRead(leftSensorPin))/2;
-    rightSensor = (rightSensor + analogRead(rightSensorPin))/2;
-  }*/
   int leftSensorMapped = map(leftSensor, minLeft, maxLeft, 0, 100);
   int rightSensorMapped = map(rightSensor, minRight, maxRight, 0, 100);
   
@@ -111,13 +110,14 @@ char CheckSensors() {
   Serial.print(rightSensorMapped);
   Serial.print("\n");
   
-  if ((leftSensorMapped < 50) and (rightSensorMapped > 50))
+  if ((leftSensorMapped > 50) and (rightSensorMapped < 50)) {
     // left sensor touches the line while right sensor stays in
     return -1;
-  if ((rightSensorMapped < 50) and (leftSensorMapped > 50))
+  }
+  if ((rightSensorMapped > 50) and (leftSensorMapped < 50))
     // right sensor touches the line while left sensor stays in
     return 1;
-  if ((leftSensorMapped < 50) and (rightSensorMapped < 50))
+  if ((leftSensorMapped > 50) and (rightSensorMapped > 50))
     // both sensors touch the line -> intersection
     return 2;
   // no sensor touches line, keep current motion
@@ -128,87 +128,105 @@ char CheckSensors() {
 // uses LED to indicate sensor reading results: HIGH: touch line LOW: in white region
 void LineFollow(int dist, int dir) {
   
-  char drivingInst = CheckSensors();
-  char count = 0;
+  int drivingInst;
+  byte count = 0;
+  int inttime = millis();
   
-  if (drivingInst == -1) {
-    // left sensor touches the line, adjust to the left
-   
-    digitalWrite(leftLED, HIGH);
-    digitalWrite(rightLED, LOW);
-
-    analogWrite(leftMotorEnablePin, SLOWSPEED);
-    analogWrite(rightMotorEnablePin, FASTSPEED);
+  while (true) {
     
-  }
-  
-  if (drivingInst == 1) {
-    // right sensor touches the line, adjust to the right
+    drivingInst = CheckSensors();
     
-    digitalWrite(leftLED, LOW);
-    digitalWrite(rightLED, HIGH);
-
-    analogWrite(leftMotorEnablePin, FASTSPEED);
-    analogWrite(rightMotorEnablePin, SLOWSPEED);
+    if (drivingInst == -1) {
+      Serial.println("going left");
+      // left sensor touches the line, adjust to the left   
+      digitalWrite(leftLED, HIGH);
+      digitalWrite(rightLED, LOW);
   
-  }
-  
-  if (drivingInst == 2) {
-    digitalWrite(leftLED, HIGH);
-    digitalWrite(rightLED, HIGH);
-    digitalWrite(leftMotorEnablePin, 0);
-    digitalWrite(rightMotorEnablePin, 0);
-    /*
-    count++;
-    if (count == dist) {
-      // make a turn
-      Turn(dir);
-      // restore forward motion before returning
-      digitalWrite(leftMotorEnablePin, LOW);
-      digitalWrite(rightMotorEnablePin, LOW);
-      delay(500);
-      digitalWrite(leftMotorCtrlPin1, HIGH);
-      digitalWrite(leftMotorCtrlPin2, LOW);
-      digitalWrite(rightMotorCtrlPin1, HIGH);
-      digitalWrite(rightMotorCtrlPin2, LOW);
+      analogWrite(leftMotorEnablePin, FASTSPEED);
+      analogWrite(rightMotorEnablePin, SLOWSPEED);
       
-      return;
-    }*/
-  }
-  
-  if (drivingInst == 0) {
-    digitalWrite(leftLED, LOW);
-    digitalWrite(rightLED, LOW);
+    }
     
-    analogWrite(leftMotorEnablePin, NORMALSPEED);
-    analogWrite(rightMotorEnablePin, NORMALSPEED);
-
-  }
-
-  /*Serial.print(leftMotorSpeed);
-  Serial.print('\t');
-  Serial.println(rightMotorSpeed);*/
+    if (drivingInst == 1) {
+      // right sensor touches the line, adjust to the right 
+      digitalWrite(leftLED, LOW);
+      digitalWrite(rightLED, HIGH);
   
+      analogWrite(leftMotorEnablePin, SLOWSPEED);
+      analogWrite(rightMotorEnablePin, FASTSPEED);
+    
+    }
+    
+    if (drivingInst == 2) {
+      digitalWrite(leftLED, HIGH);
+      digitalWrite(rightLED, HIGH);
+      /*digitalWrite(leftMotorEnablePin, 0);
+      digitalWrite(rightMotorEnablePin, 0);
+      delay(1000);*/
+      if ((millis() - inttime) > 2000) {
+        count++;
+        inttime = millis();
+        Serial.println("Intersection");
+        Serial.println(count);
+      }
+      
+      if (count == dist) {
+        Serial.print("Distance reached");
+        // make a turn
+        Turn(dir);
+        // restore forward motion before returning
+        /*digitalWrite(leftMotorEnablePin, LOW);
+        digitalWrite(rightMotorEnablePin, LOW);
+        delay(500);*/
+        digitalWrite(leftMotorCtrlPin1, HIGH);
+        digitalWrite(leftMotorCtrlPin2, LOW);
+        digitalWrite(rightMotorCtrlPin1, HIGH);
+        digitalWrite(rightMotorCtrlPin2, LOW);
+        return;
+      }
+    }
+    
+    if (drivingInst == 0) {
+      digitalWrite(leftLED, LOW);
+      digitalWrite(rightLED, LOW);
+      
+      analogWrite(leftMotorEnablePin, NORMALSPEED);
+      analogWrite(rightMotorEnablePin, NORMALSPEED);
+  
+    }
+  }
 }
 
 void Turn(byte dir) {
   
+   int state = 0;
+  
    switch (dir) {
        case 1: 
-           // Turning left
-           digitalWrite(leftMotorEnablePin, LOW);
-           digitalWrite(rightMotorEnablePin, LOW);
-           delay(500);
+       // Turning left
+           digitalWrite(leftMotorEnablePin, 0);
+           digitalWrite(rightMotorEnablePin, 0);
+           digitalWrite(turnLED, HIGH);
+           //delay(500);
            digitalWrite(rightMotorCtrlPin1, HIGH);
            digitalWrite(rightMotorCtrlPin2, LOW);
            digitalWrite(leftMotorCtrlPin1, LOW);
            digitalWrite(leftMotorCtrlPin2, HIGH);
            analogWrite(leftMotorEnablePin, NORMALSPEED);
            analogWrite(rightMotorEnablePin, NORMALSPEED);
-           // Time to make a 90 degree turn
-           delay(1500);
+           
+           delay(300);
+           while(true) {
+             state = CheckSensors();
+             Serial.println(state);
+             if ((state == -1) )
+               break;
+           }
+           
+           digitalWrite(turnLED, LOW);
+           break;
        case 2:
-           // Turning right
+       // Turning right
            digitalWrite(leftMotorEnablePin, LOW);
            digitalWrite(rightMotorEnablePin, LOW);
            delay(500);
@@ -217,14 +235,15 @@ void Turn(byte dir) {
            digitalWrite(leftMotorCtrlPin1, HIGH);
            digitalWrite(leftMotorCtrlPin2, LOW);
            analogWrite(leftMotorEnablePin, NORMALSPEED);
-           analogWrite(rightMotorEnablePin, NORMALSPEED);
+           analogWrite(rightMotorEnablePin, SLOWSPEED);
            // Time to make a 90 degree turn
            delay(1500);
+           break;
    }
    return;
 }
 
-int dist = 1;
+int dist = 2;
 int dir = 1;
   
 void loop() {
@@ -235,9 +254,17 @@ void loop() {
   digitalWrite(rightMotorCtrlPin2, LOW);
   
   LineFollow(dist, dir);
-  /*delay(2000);
-  Turn(dir);*/
   
+  Serial.println("DONE :)");
+  digitalWrite(leftMotorEnablePin, 0);
+  digitalWrite(rightMotorEnablePin, 0);
+  delay(5000);
+  LineFollow(dist,dir);
+    
+  Serial.println("DONE :)");
+  digitalWrite(leftMotorEnablePin, 0);
+  digitalWrite(rightMotorEnablePin, 0);
+  delay(5000);
 }
 
 
