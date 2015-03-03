@@ -1,24 +1,21 @@
-// include the servo library
 #include <Servo.h>
 
-Servo myServo;  // create a servo object 
+Servo mySweeper;  
 
 void setup() {
-  myServo.attach(3); // attaches the servo on pin 9 to the servo object 
+  mySweeper.attach(8); 
 }
 
 void loop() {
-
-  // scale the numbers from the pot 
-  //angle = map(potVal, 0, 1023, 0, 179);
-
+  
   // set the servo position  
-  myServo.write(0);
-
+  mySweeper.write(45);
   // wait for the servo to get there 
-  delay(1000);
-  myServo.write(110);
-  delay(1000);
+  delay(10000);
+  
+  mySweeper.write(135);
+  delay(10000);
+  
 }
 
 
