@@ -1,5 +1,6 @@
 #include <Keypad.h>
 
+
 const byte ROWS = 4; // Four rows
 const byte COLS = 3; // Three columns
 // Define the Keymap
@@ -10,9 +11,9 @@ char keys[ROWS][COLS] = {
   {'#','0','*'}
 };
 // Connect keypad ROW0, ROW1, ROW2 and ROW3 to these Arduino pins.
-byte rowPins[ROWS] = { 9, 8, 7, 6 };
+byte rowPins[ROWS] = { 11, 10, 9, 8 };
 // Connect keypad COL0, COL1 and COL2 to these Arduino pins.
-byte colPins[COLS] = { 12, 11, 10 }; 
+byte colPins[COLS] = { 7, 6, 5 }; 
 
 // Create the Keypad
 Keypad kpd = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
@@ -22,8 +23,7 @@ byte hopper2 = 0;
 
 void setup()
 {
-  pinMode(ledpin,OUTPUT);
-  digitalWrite(ledpin, HIGH);
+  
   Serial.begin(9600);
 }
 
@@ -32,7 +32,7 @@ void loop()
   while (true) {
     
     char key = kpd.getKey();
-  
+    Serial.println(key);
     if(key)  // Check for a valid key.
     {
       if (key == '#')
