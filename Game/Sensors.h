@@ -12,6 +12,6 @@
 #include <stdio.h>
 
 void calibrate();
-int CheckSensors(bool);
+int CheckSensors(int);
 
 #endif /* defined(____Sensors__) */

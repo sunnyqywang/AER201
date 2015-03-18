@@ -1,5 +1,6 @@
 #include <Servo.h>
 #include <Arduino.h>
+#include <Keypad.h>
 #include "Data.h"
 #include "Sensors.h"
 #include "GridFollowing.h"
@@ -8,9 +9,6 @@ Servo mySweeper;
 
 void setup() {
   Serial.begin(9600);
-  
-  pinMode(leftLED, OUTPUT);
-  pinMode(rightLED, OUTPUT);
   
   mySweeper.attach(12);
   
@@ -40,26 +38,12 @@ void setup() {
 }
   
 void loop() {
-//  Turn(1);
-//  delay(1000);
-//  Serial.println("1");
-//  
-//  LineFollow(2,2);
-//  delay(1000);
-//  Serial.println("2");
-//  
-//  LineFollow(2,1);
-//  delay(1000);
-//  Serial.println("3");
-//  
-//  LineFollow(1,2);
-//  delay(1000);
-//  Serial.println("4");
-//  
-//  LineFollow(1,0);
-LineFollow(3,1);
+
+  Turn(1);
+  LineFollow(2,2);
+  LineFollow(3,0);
   
-  delay(5000);
+  
   
 }
 

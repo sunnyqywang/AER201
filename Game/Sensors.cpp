@@ -18,17 +18,31 @@ int maxPhotoLeft = 0;
 int minPhotoLeft = 1023;
 int maxPhotoRight = 0;
 int minPhotoRight = 1023;
+int maxTurnLeft = 0;
+int minTurnLeft = 1023;
+int maxTurnRight = 0;
+int minTurnRight = 1023;
 
 void calibrate() {
     int time = millis();
     int leftSensor, rightSensor;
     int leftPhotoSensor, rightPhotoSensor;
+    int leftTurnSensor, rightTurnSensor;
+    
+    digitalWrite(leftMotorCtrlPin1, HIGH);
+    digitalWrite(leftMotorCtrlPin2, LOW);
+    digitalWrite(rightMotorCtrlPin1, HIGH);
+    digitalWrite(rightMotorCtrlPin2, LOW);
+    analogWrite(leftMotorEnablePin, NORMALSPEED);
+    analogWrite(rightMotorEnablePin, NORMALSPEED);
     
     while ((millis() - time) < 3000) {
         leftSensor = analogRead(leftSensorPin);
         rightSensor = analogRead(rightSensorPin);
         leftPhotoSensor = analogRead(leftPhotoSensorPin);
         rightPhotoSensor = analogRead(rightPhotoSensorPin);
+        leftTurnSensor = analogRead(leftTurnSensorPin);
+        rightTurnSensor = analogRead(rightTurnSensorPin);
 
         if (maxLeft < leftSensor)
             maxLeft = leftSensor;
@@ -48,6 +62,14 @@ void calibrate() {
         if (minPhotoRight > rightPhotoSensor)
             minPhotoRight = rightPhotoSensor;
 
+        if (maxTurnLeft < leftTurnSensor)
+            maxTurnLeft = leftTurnSensor;
+        if (minTurnLeft > leftTurnSensor)
+            minTurnLeft = leftTurnSensor;
+        if (maxTurnRight < rightTurnSensor)
+            maxTurnRight = rightTurnSensor;
+        if (minTurnRight > rightTurnSensor)
+            minTurnRight = rightTurnSensor;
         
     }
     
@@ -64,29 +86,36 @@ void calibrate() {
     Serial.print(maxPhotoRight);
     Serial.print("\t");
     Serial.println(minPhotoRight);
+    Serial.print(maxTurnLeft);
+    Serial.print("\t");
+    Serial.println(minTurnLeft);
+    Serial.print(maxTurnRight);
+    Serial.print("\t");
+    Serial.println(minTurnRight);
     
-    // LEDs indicate calibration is done
-    digitalWrite(leftLED, HIGH);
-    digitalWrite(rightLED, HIGH);
-    delay(2000);
-    digitalWrite(leftLED, LOW);
-    digitalWrite(rightLED, LOW);
+    analogWrite(leftMotorEnablePin, 0);
+    analogWrite(rightMotorEnablePin, 0);
+    
+    delay(3000);
     
     return;
 }
 
 // get sensor readings and make adjustment decisions
-int CheckSensors(bool type) {
+int CheckSensors(int type) {
     
-    // Type: 1 for reading IR; 0 for reading photoresistors
+    // Type: 2 for reading turn sensors; 1 for reading IR; 0 for reading photoresistors
  
     int leftPin, rightPin;
     int leftSensorMapped, rightSensorMapped;
     
-    if (type) {
+    if (type == 2) {
+        leftPin = leftTurnSensorPin;
+        rightPin = rightTurnSensorPin;
+    } else if (type == 1) {
         leftPin = leftSensorPin;
         rightPin = rightSensorPin;
-    }else {
+    } else if (type == 0) {
         leftPin = leftPhotoSensorPin;
         rightPin = rightPhotoSensorPin;
     }
@@ -94,16 +123,20 @@ int CheckSensors(bool type) {
     int leftSensor = analogRead(leftPin);
     int rightSensor = analogRead(rightPin);
     
-    if (type) {
+    if (type == 0) {
         
         leftSensorMapped = map(leftSensor, minLeft, maxLeft, 0, 100);
         rightSensorMapped = map(rightSensor, minRight, maxRight, 0, 100);
         
-    } else {
+    } else if (type == 1) {
         
         leftSensorMapped = map(leftSensor, minPhotoLeft, maxPhotoLeft, 0, 100);
         rightSensorMapped = map(rightSensor, minPhotoRight, maxPhotoRight, 0, 100);
         
+    } else if (type == 2) {
+      
+        leftSensorMapped = map(leftSensor, minTurnLeft, maxTurnLeft, 0, 100);
+        rightSensorMapped = map(rightSensor, minTurnRight, maxTurnRight, 0, 100);
     }
     
     if ((leftSensorMapped > 50) and (rightSensorMapped < 50)) 
