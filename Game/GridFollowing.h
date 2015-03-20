@@ -11,6 +11,10 @@
 
 #include <stdio.h>
 
+void ForwardMotion();
+void BackwardMotion();
+void TurningLeft();
+void TurningRight();
 void LineFollow(int, int);
 void Turn(int);
 

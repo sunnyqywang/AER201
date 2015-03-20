@@ -11,6 +11,48 @@
 #include "Sensors.h"
 #include "Data.h"
 
+void ForwardMotion() {
+
+  digitalWrite(leftMotorCtrlPin1, HIGH);
+  digitalWrite(leftMotorCtrlPin2, LOW);
+  digitalWrite(rightMotorCtrlPin1, HIGH);
+  digitalWrite(rightMotorCtrlPin2, LOW);
+  analogWrite(leftMotorEnablePin, NORMALSPEED);
+  analogWrite(rightMotorEnablePin, NORMALSPEED);
+  
+}
+
+void BackwardMotion() {
+
+  digitalWrite(leftMotorCtrlPin1, LOW);
+  digitalWrite(leftMotorCtrlPin2, HIGH);
+  digitalWrite(rightMotorCtrlPin1, LOW);
+  digitalWrite(rightMotorCtrlPin2, HIGH);
+  analogWrite(leftMotorEnablePin, NORMALSPEED);
+  analogWrite(rightMotorEnablePin, NORMALSPEED);
+  
+}
+
+void TurningLeft() {
+  
+  // Reverse the direction of the left motor
+  digitalWrite(rightMotorCtrlPin1, HIGH);
+  digitalWrite(rightMotorCtrlPin2, LOW);
+  digitalWrite(leftMotorCtrlPin1, LOW);
+  digitalWrite(leftMotorCtrlPin2, HIGH);
+  
+}
+
+void TurningRight() {
+  
+  // Reverse the direction of the right motor
+  digitalWrite(rightMotorCtrlPin1, LOW);
+  digitalWrite(rightMotorCtrlPin2, HIGH);
+  digitalWrite(leftMotorCtrlPin1, HIGH);
+  digitalWrite(leftMotorCtrlPin2, LOW);
+
+}
+
 void Turn(int dir) {
     // 1 for turning left, 2 for turning right
     
@@ -27,17 +69,14 @@ void Turn(int dir) {
         case 1:
             
             // Reverse the direction of the left motor
-            digitalWrite(rightMotorCtrlPin1, HIGH);
-            digitalWrite(rightMotorCtrlPin2, LOW);
-            digitalWrite(leftMotorCtrlPin1, LOW);
-            digitalWrite(leftMotorCtrlPin2, HIGH);
+            TurningLeft();
             
             // Initiate turning motion
-            Serial.println("TURNINGGGGG");
+            Serial.println("TURNING");
             analogWrite(leftMotorEnablePin, NORMALSPEED);
             analogWrite(rightMotorEnablePin, NORMALSPEED-40);
             
-            // Approximate turning time needed
+            // Get off the line
             delay(1000);
             
             // Feedback to check if turning is finished
@@ -71,24 +110,41 @@ void Turn(int dir) {
         case 2:
 
             // Reverse the direction of the right motor
-            digitalWrite(rightMotorCtrlPin1, LOW);
-            digitalWrite(rightMotorCtrlPin2, HIGH);
-            digitalWrite(leftMotorCtrlPin1, HIGH);
-            digitalWrite(leftMotorCtrlPin2, LOW);
+            TurningRight();
             
             // Initiate turning motion
             analogWrite(leftMotorEnablePin, NORMALSPEED);
             analogWrite(rightMotorEnablePin, NORMALSPEED);
             
             // Approximate turning time needed
-            delay(2200);
+            delay(1000);
+            // Feedback to check if turning is finished
             
-//            while (true) {
-//                state0 = CheckSensors(0);
-//                state1 = CheckSensors(1);
-//                if (state0 == 2 and state1 == 2)
-//                    break;
-//            }
+            while (true) {
+                state = CheckSensors(2);
+                
+                Serial.println(state);
+                
+                if (state == -1){
+                  Serial.println("Left done");
+                  leftdone = 1;
+                  analogWrite(leftMotorEnablePin, 0);
+                }
+                
+                if (state == 1){
+                  Serial.println("Right done");
+                  rightdone = 1;
+                  analogWrite(rightMotorEnablePin, 0);
+                }
+                
+                if ((state == 2) or (leftdone && rightdone)){
+                    analogWrite(leftMotorEnablePin, 0);
+                    analogWrite(rightMotorEnablePin, 0);
+                    Serial.println("Both done");
+                    break;
+                }
+            }
+            
             break;
         default: 
             break;
@@ -107,8 +163,7 @@ void LineFollow(int dist, int dir) {
     while (true) {
         
         drivingInst = CheckSensors(1);
-        // warning
-        photoInst = CheckSensors(1);
+        photoInst = CheckSensors(0);
         
         if ((drivingInst != photoInst) && (drivingInst != 0) && (photoInst != 0)) {
             Serial.println("wrong");
@@ -116,12 +171,14 @@ void LineFollow(int dist, int dir) {
         }
         
         if ((drivingInst == 0) && (photoInst == 0)) {
+          
             Serial.println("Moving forward");
             
             analogWrite(leftMotorEnablePin, NORMALSPEED);
             analogWrite(rightMotorEnablePin, NORMALSPEED);
             
         } else if (drivingInst == 0) {
+          
             drivingInst = photoInst;
         }
         
@@ -155,15 +212,7 @@ void LineFollow(int dist, int dir) {
                 // make a turn
                 Turn(dir);
                 // restore forward motion before returning
-                digitalWrite(leftMotorEnablePin, LOW);
-                digitalWrite(rightMotorEnablePin, LOW);
-                delay(200);
-                digitalWrite(leftMotorCtrlPin1, HIGH);
-                digitalWrite(leftMotorCtrlPin2, LOW);
-                digitalWrite(rightMotorCtrlPin1, HIGH);
-                digitalWrite(rightMotorCtrlPin2, LOW);
-                analogWrite(leftMotorEnablePin, NORMALSPEED);
-                analogWrite(rightMotorEnablePin, NORMALSPEED);
+                ForwardMotion();
                 return;
             }
         }
