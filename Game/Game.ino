@@ -1,7 +1,6 @@
 // Notes:
-// need to verify servo attachments
 // check delay values for angles other than 90 degrees
-// verify microswitch pin assignments
+
 // manual path finding for toBoard
 
 #include <Servo.h>
@@ -11,17 +10,20 @@
 #include "Sensors.h"
 #include "GridFollowing.h"
 #include "NearHopper.h"
+#include "EnterHopperPos.h"
+#include "Arm.h"
 
 Servo mySweeper;
 Servo myArm;
 int index, hopper;
+int firstTime = true;
 
 void setup() {
   
   Serial.begin(9600);
-  
-  mySweeper.attach(12);
-  myArm.attach(13);
+
+  mySweeper.attach(9);
+  myArm.attach(8);
   
   pinMode(leftHopperLockPin, INPUT);
   pinMode(rightHopperLockPin, INPUT);
@@ -43,98 +45,109 @@ void setup() {
   
   calibrate();
   
-  // Set motors in motion
+  //GetHopperPos();
+
   ForwardMotion();
-  analogWrite(leftMotorEnablePin, NORMALSPEED);
-  analogWrite(rightMotorEnablePin, NORMALSPEED);
+  
   
 }
   
 void loop() {
-  
-  // 1. Set hopper number
-  hopper = 2;
-  
-  // 2. Going to the hopper intersection
-  index = 0;
-  while (toHopper[hopper][index] < 10) {
-    if (toHopper[hopper][index] == 0)
-      LineFollow(toHopper[hopper][index],toHopper[hopper][index+1]);
-    else
-      Turn(toHopper[hopper][index+1]);
-    index += 2;
+
+  // 0. Check if it's the first run
+  if (!firstTime) {
+      LineFollow(BOARDTOSTART[0], BOARDTOSTART[1]);
+      LineFollow(BOARDTOSTART[2], BOARDTOSTART[3]);
+      LineFollow(BOARDTOSTART[4], BOARDTOSTART[5]);
+      LineFollow(BOARDTOSTART[6], BOARDTOSTART[7]);
+      LineFollow(BOARDTOSTART[8], BOARDTOSTART[9]);
+      firstTime = false;
   }
   
-  Serial.print("Arrived at hopper intersection");
-  delay(2000);
+  // 1. Set hopper number, initialize arm and sweeper
+  hopper = 1;
+  
+  LiftArmHalfWay();
+  
+  CloseSweeper();
+  
+  // 2. Going to the hopper intersection
+//  index = 2;
+//  while (toHopper[hopper][index+1] < 10) {
+//    if (toHopper[hopper][index] != 0) {
+//      LineFollow(toHopper[hopper][index],toHopper[hopper][index+1]);
+//    } else
+//      Turn(toHopper[hopper][index+1]);
+//    index += 2;
+//  }
+//  
+//  Serial.println("Arrived at hopper intersection");
+//  StopMotors();
+
   
   // 3. Drop the arm and open the sweeper
   
-  myArm.write(-15);
-  delay(200);
-  myArm.write(-30);
-  delay(200);
-  myArm.write(-45);
+  ArmDrop();
   
-  mySweeper.write(110);
+  OpenSweeper();
   
-  Serial.print("Arm and Sweeper ready");
-  delay(2000);
+  Serial.println("Arm and Sweeper ready");
+  delay(1000);
   
   // 4. Go in hopper
-  
+  index = 4;
   ApproachHopper(toHopper[hopper][index], toHopper[hopper][index+1]);
-  
-  Serial.print("Inside Hopper, ready to catch");
-  delay(2000);
+  Serial.println("Inside Hopper, ready to catch");
+  delay(1000);
   
   // 5. Close Sweeper
   
-  mySweeper.write(-110);
+  CloseSweeper();
   
   Serial.print("Got the ball");
-  delay(2000);
-  
+  delay(1000);
+ 
   // 6. Go back to hopper intersection
   //    Reverse the actions when going in the hoppers
   
-  ExitHopper(toHopper[hopper][index], toHopper[hopper][index+1]);
-  
-  Serial.print("Back to hopper intersection");
-  delay(2000);
-  
+  ExitHopper(toHopper[hopper][index], toHopper[hopper][index+1]); 
+
+  Serial.println("Back to hopper intersection");
+  delay(1000);
+ 
   // 7. Lift arm halfway
   
-  myArm.write(-30);
-  delay(200);
-  myArm.write(-15);
-  delay(200);
-  myArm.write(0);
+  ArmHalfWay();
   
-  Serial.print("Arm lifted, Ready to go");
-  delay(2000);
-  
+  Serial.println("Arm lifted, Ready to go");
+  delay(1000);
+ 
   // 8. Go to gameboard
+//  index = 0;
+//  while (index < 7) {
+//    LineFollow(toBoard[hopper][index], toBoard[hopper][index+1]);
+//    Serial.print(toBoard[hopper][index]);
+//    Serial.print(toBoard[hopper][index+1]);
+//    index +=2;
+//  }
+  LineFollow(1,1);
+  LineFollow(1,2);
+  LineFollow(4,2);
+  LineFollow(3,0);
   
-  index = 0;
-  while (toBoard[hopper][index] !=0) {
-    LineFollow(toBoard[hopper][index], toBoard[hopper][index+1]);
-    index +=2;
-  }
+  StopMotors();
   
-  Serial.print("Arrived at the game board, ready to drop");
-  delay(2000);
+  Serial.println("Arrived at the game board, ready to drop");
+  delay(1000);
   
   // 9. Lift arm all the way to deposit the ball
   
-  myArm.write(15);
-  delay(200);
-  myArm.write(30);
-  delay(200);
-  myArm.write(50);
+  ArmAllTheWay();
+  delay(1000);
+  DropArmHalfWay();
   
-  Serial.print("Done! Did the ball go in? Am I good? Go ahead and compliment!");
-  delay(2000);
+  Serial.println("Done! Did the ball go in? Am I good? Go ahead and compliment me!");
+  delay(200000000);
   
 }
 

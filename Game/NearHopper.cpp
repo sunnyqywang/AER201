@@ -6,10 +6,11 @@
 //
 //
 
+#include <Arduino.h>
 #include "NearHopper.h"
 #include "GridFollowing.h"
-#include <Arduino.h>
 #include "Data.h"
+#include "Sensors.h"
 
 int time;
 int timeElapsed;
@@ -33,15 +34,14 @@ void ApproachHopper(int dir, int angle) {
             break;
     }
     
-    analogWrite(leftMotorEnablePin, NORMALSPEED);
-    analogWrite(rightMotorEnablePin, NORMALSPEED);
+    StartMotors();
     
     switch (angle) {
         case 10:
             delay(300);
             break;
         case 30:
-            delay(600);
+            delay(400);
             break;
         case 45:
             delay(900);
@@ -50,34 +50,45 @@ void ApproachHopper(int dir, int angle) {
             break;
     }
     
+    StopMotors();
+    
     ForwardMotion();
+    StartMotors();
     
-    time = millis();
+    delay(4000);
     
-    analogWrite (leftMotorEnablePin, NORMALSPEED);
-    analogWrite (rightMotorEnablePin, NORMALSPEED);
-    
-    while (leftHopperLock == LOW or rightHopperLock == LOW) {
-        
-        leftHopperLock = digitalRead(leftHopperLockPin);
-        rightHopperLock = digitalRead(rightHopperLockPin);
-    
-        if (leftHopperLock == HIGH) {
-            analogWrite(leftMotorEnablePin, 0);
-        }
-        if (rightHopperLock == HIGH) {
-            analogWrite(rightMotorEnablePin, 0);
-        }
-    }
-    
-    timeElapsed = millis()-time;
+    StopMotors();
+//    time = millis();
+//    while (leftHopperLock == LOW or rightHopperLock == LOW) {
+//        
+//        leftHopperLock = digitalRead(leftHopperLockPin);
+//        rightHopperLock = digitalRead(rightHopperLockPin);
+//    
+//        if (leftHopperLock == HIGH) {
+//            analogWrite(leftMotorEnablePin, 0);
+//        }
+//        if (rightHopperLock == HIGH) {
+//            analogWrite(rightMotorEnablePin, 0);
+//        }
+//    }
+//    
+//    timeElapsed = millis()-time;
     
 }
 
 void ExitHopper(int dir, int angle) {
     
+    int state = 10;
+    int leftdone = 0;
+    int rightdone = 0;
+    int time = 0;
+    int updatedTime = 0;
+    int maxTime;
+    
     BackwardMotion();
-    delay(timeElapsed);
+    StartMotors();
+    //delay(timeElapsed);
+    delay(3000);
     
     switch (dir) {
         case 1:
@@ -91,22 +102,46 @@ void ExitHopper(int dir, int angle) {
         default:
             break;
     }
-    
-    analogWrite(leftMotorEnablePin, NORMALSPEED);
-    analogWrite(rightMotorEnablePin, NORMALSPEED);
-    
-    switch (angle) {
+     
+     switch (angle) {
         case 10:
-            delay(300);
+            maxTime = 400;
             break;
         case 30:
-            delay(600);
+            maxTime = 450;
             break;
         case 45:
-            delay(900);
+            maxTime = 1000;
             break;
         default:
             break;
-    }
+    } 
+    time = millis();
+    updatedTime = millis();
     
+    while (updatedTime - time < maxTime) {
+        state = CheckSensors(2);
+        
+        Serial.println(state);
+        
+        if (state == -1){
+          Serial.println("Left done");
+          leftdone = 1;
+          analogWrite(leftMotorEnablePin, 0);
+        }
+        
+        if (state == 1){
+          Serial.println("Right done");
+          rightdone = 1;
+          analogWrite(rightMotorEnablePin, 0);
+        }
+        
+        if ((state == 2) or (leftdone && rightdone)){
+            StopMotors();
+            Serial.println("Both done");
+            break;
+        }
+        updatedTime = millis();
+    }
+    StopMotors();
 }

@@ -15,6 +15,8 @@ void ForwardMotion();
 void BackwardMotion();
 void TurningLeft();
 void TurningRight();
+void StartMotors();
+void StopMotors();
 void LineFollow(int, int);
 void Turn(int);
 

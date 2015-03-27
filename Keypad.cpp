@@ -43,6 +43,7 @@ void loop()
         if(key)  // Check for a valid key.
         {
             if (key == '#')
+                Serial.println(
                 break;
             if (key == '*') {
                 hopper1 = hopper1 / 10;
