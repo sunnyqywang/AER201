@@ -25,7 +25,7 @@ int maxTurnRight = 0;
 int minTurnRight = 1023;
 
 void calibrate() {
-    unsigned long time = millis();
+    int time = millis();
     int leftSensor, rightSensor;
     int leftPhotoSensor, rightPhotoSensor;
     int leftTurnSensor, rightTurnSensor;

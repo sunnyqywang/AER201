@@ -27,23 +27,23 @@ const int rightPhotoSensorPin = A14;
 const int leftTurnSensorPin = A12;
 const int rightTurnSensorPin = A15;
 
-const int hopperLockPin = A6;
+const int leftHopperLockPin = 30;
+const int rightHopperLockPin = 31;
 const int LEFTSLOWSPEED = 170;
 const int LEFTFASTSPEED = 255;
 const int LEFTNORMALSPEED = 220;
 const int RIGHTSLOWSPEED = 170;
 const int RIGHTFASTSPEED = 255;
-const int RIGHTNORMALSPEED = 200;
+const int RIGHTNORMALSPEED = 220;
 
 const int ARMHORIZONTAL = 100;
 const int SWEEPERCLOSED = 140;
 const int SWEEPEROPEN = 70;
 
-const int UltrasonicPin = 35;
 // Stores the path from starting position to the central hoppers
 const int toHopper[12][9] = 
           {{2,2,2,1,1,2,1,2,45},
-           {2,2,2,0,2,15,0,0,0},
+           {2,2,2,0,2,30,0,0,0},
            {2,2,3,2,30,0,0,0,0},
            {1,2,2,2,30,0,0,0,0},
            {2,2,1,1,1,2,45,0,0},
