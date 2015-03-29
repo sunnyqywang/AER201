@@ -7,6 +7,8 @@
 //
 
 #include "Ultrasonic.h"
+#include <Arduino.h>
+#include "Data.h"
 
 void CheckPulse(int expectedDuration) {
     int duration = 2000;
@@ -21,7 +23,7 @@ void CheckPulse(int expectedDuration) {
         digitalWrite(UltrasonicPin,LOW);
         
         pinMode(UltrasonicPin, INPUT);
-        duration = pulseIn(UltrasonicPin);
+        duration = pulseIn(UltrasonicPin, HIGH);
         
         delay(5);
         

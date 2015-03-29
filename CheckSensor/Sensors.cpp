@@ -8,7 +8,6 @@
 
 #include "Sensors.h"
 #include "Data.h"
-#include "GridFollowing.h"
 
 // Calibrate the sensors
 int maxLeft = 0;
@@ -34,7 +33,6 @@ void calibrate() {
     digitalWrite(leftMotorCtrlPin2, LOW);
     digitalWrite(rightMotorCtrlPin1, HIGH);
     digitalWrite(rightMotorCtrlPin2, LOW);
-    StartMotors();
     
     while ((millis() - time) < 3000) {
         leftSensor = analogRead(leftSensorPin);

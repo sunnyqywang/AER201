@@ -12,14 +12,14 @@
 #include "Data.h"
 #include "Sensors.h"
 
-int time;
-int timeElapsed;
+unsigned long time;
+unsigned long timeElapsed;
+
+extern unsigned long turnTime;
 
 void ApproachHopper(int dir, int angle) {
     
-    int leftHopperLock = LOW;
-    int rightHopperLock = LOW;
-
+    int HopperLock = 0;
     
     switch (dir) {
         case 1:
@@ -36,12 +36,25 @@ void ApproachHopper(int dir, int angle) {
     
     StartMotors();
     
+//    switch (angle) {
+//        case 15:
+//            delay(turnTime/7);
+//            break;
+//        case 30:
+//            delay(turnTime/3);
+//            break;
+//        case 45:
+//            delay(turnTime/2);
+//            break;
+//        default:
+//            break;
+//    }
     switch (angle) {
-        case 10:
-            delay(300);
+        case 15:
+            delay(400);
             break;
         case 30:
-            delay(400);
+            delay(600);
             break;
         case 45:
             delay(900);
@@ -55,24 +68,15 @@ void ApproachHopper(int dir, int angle) {
     ForwardMotion();
     StartMotors();
     
-    delay(4000);
-    
+    time = millis();
+    while (HopperLock == 0) {
+        
+        HopperLock = digitalRead(A6);
+        //Serial.println(HopperLock);
+        
+    }
     StopMotors();
-//    time = millis();
-//    while (leftHopperLock == LOW or rightHopperLock == LOW) {
-//        
-//        leftHopperLock = digitalRead(leftHopperLockPin);
-//        rightHopperLock = digitalRead(rightHopperLockPin);
-//    
-//        if (leftHopperLock == HIGH) {
-//            analogWrite(leftMotorEnablePin, 0);
-//        }
-//        if (rightHopperLock == HIGH) {
-//            analogWrite(rightMotorEnablePin, 0);
-//        }
-//    }
-//    
-//    timeElapsed = millis()-time;
+    timeElapsed = millis()-time;
     
 }
 
@@ -81,14 +85,13 @@ void ExitHopper(int dir, int angle) {
     int state = 10;
     int leftdone = 0;
     int rightdone = 0;
-    int time = 0;
-    int updatedTime = 0;
-    int maxTime;
+    unsigned long time = 0;
+    unsigned long updatedTime = 0;
+    unsigned long maxTime;
     
     BackwardMotion();
     StartMotors();
-    //delay(timeElapsed);
-    delay(3000);
+    delay(timeElapsed+100);
     
     switch (dir) {
         case 1:
@@ -104,7 +107,7 @@ void ExitHopper(int dir, int angle) {
     }
      
      switch (angle) {
-        case 10:
+        case 15:
             maxTime = 400;
             break;
         case 30:
