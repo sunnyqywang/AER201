@@ -1,3 +1,6 @@
+// Notes:
+// This version contains the new exit hopper strategy where the two wheels go back separately
+
 #include <Servo.h>
 #include <Arduino.h>
 #include <Keypad.h>
@@ -5,6 +8,7 @@
 #include "Sensors.h"
 #include "GridFollowing.h"
 #include "NearHopper.h"
+#include "EnterHopperPos.h"
 #include "Arm.h"
 
 Servo mySweeper;
@@ -13,7 +17,6 @@ int index, hopper;
 int firstTime = true;
 
 int EnterHopperPosition () {
-  
   const byte ROWS = 4; // Four rows
   const byte COLS = 3; // Three columns
   // Define the Keymap
@@ -34,8 +37,7 @@ int EnterHopperPosition () {
   char key1 = kpd.waitForKey();
   char key2 = kpd.waitForKey();
     
-  return ((int) (key1-'0')*10 + (int) (key2-'0')) - 1 ;
-  
+  return ((int) (key1-'0')*10 + (int) (key2-'0'));
 }
 
 
@@ -64,11 +66,11 @@ void setup() {
   pinMode(rightTurnSensorPin, INPUT);
   
   calibrate();
-
+ 
   ForwardMotion();
   
   hopper = EnterHopperPosition();
-  
+
 }
   
 void loop() {
@@ -107,20 +109,20 @@ void loop() {
   OpenSweeper();
   
   Serial.println("Arm and Sweeper ready");
-  delay(500);
+  delay(1000);
   
   // 4. Go in hopper
   ApproachHopper(toHopper[hopper][index], toHopper[hopper][index+1]);
-
+  //ApproachHopper(2,15);
   Serial.println("Inside Hopper, ready to catch");
-  delay(300);
+  delay(1000);
   
   // 5. Close Sweeper
   
   CloseSweeper();
   
   Serial.print("Got the ball");
-  delay(300);
+  delay(1000);
  
   // 6. Go back to hopper intersection
   //    Reverse the actions when going in the hoppers
@@ -128,39 +130,35 @@ void loop() {
   ExitHopper(toHopper[hopper][index], toHopper[hopper][index+1]); 
 
   Serial.println("Back to hopper intersection");
+  delay(1000);
  
   // 7. Lift arm halfway
   
   LiftArmHalfWay();
   
   Serial.println("Arm lifted, Ready to go");
-  delay(500);
+  delay(1000);
  
   // 8. Go to gameboard
   index = 0;
   while (index < 7) {
-    
-    if (toBoard[hopper][index] == 0 && toBoard[hopper][index+1] != 0)
-      Turn(toBoard[hopper][index+1]);
-    else if (toBoard[hopper][index] != 0)
-      LineFollow(toBoard[hopper][index], toBoard[hopper][index+1]);
-      
+    LineFollow(toBoard[hopper][index], toBoard[hopper][index+1]);
     index +=2;
   }
   
   StopMotors();
   
   Serial.println("Arrived at the game board, ready to drop");
-  delay(500);
+  delay(1000);
   
   // 9. Lift arm all the way to deposit the ball
   
   ArmAllTheWay();
-  delay(500);
+  delay(1000);
   DropArmHalfWay();
   
   Serial.println("Done! Did the ball go in? Am I good? Go ahead and compliment me!");
-  delay(1000);
+  delay(200000000);
   
 }
 

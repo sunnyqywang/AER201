@@ -28,6 +28,7 @@ const int leftTurnSensorPin = A12;
 const int rightTurnSensorPin = A15;
 
 const int hopperLockPin = A6;
+
 const int LEFTSLOWSPEED = 120;
 const int LEFTFASTSPEED = 180;
 const int LEFTNORMALSPEED = 150;
@@ -46,13 +47,13 @@ const int toHopper[12][10] =
            {2,2,3,0,2,30,0,0,0,0},
            {1,2,2,0,2,15,0,0,0,0},
            {2,2,1,1,1,2,1,0,2,45},
-           {1,2,1,0,1,10,0,0,0,0},       
+           {1,2,1,0,1,15,0,0,0,0},       
            {2,2,2,0,2,45,0,0,0,0},
-           {1,2,1,0,2,10,0,0,0,0},          
+           {1,2,1,0,2,15,0,0,0,0},          
            {2,2,1,1,1,2,2,45,0,0},          
            {1,2,1,10,0,0,0,0,0,0},
            {2,2,1,0,2,45,0,0,0,0},
-           {1,2,2,10,0,0,0,0,0,0}};
+           {1,2,2,15,0,0,0,0,0,0}};
           
 //Stores the path from the central hoppers to the game board
 const int toBoard[12][8] = 

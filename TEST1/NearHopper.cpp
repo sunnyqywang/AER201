@@ -15,7 +15,7 @@
 unsigned long time;
 unsigned long timeElapsed;
 
-void ApproachHopper(int dir, int angle) {
+int ApproachHopper(int dir, int angle) {
     
     int HopperLock = 0;
     
@@ -57,11 +57,19 @@ void ApproachHopper(int dir, int angle) {
     while (HopperLock == 0) {
         
         HopperLock = digitalRead(A6);
-        
+        if (millis() - time > 2500) 
+           break; 
+           
     }
     StopMotors();
-    timeElapsed = millis()-time;
     
+    if (HopperLock == 1) {
+      timeElapsed = millis()-time;
+      return 1;
+    }else {
+      timeElapsed = 2000;
+      return 0;
+    }
 }
 
 void ExitHopper(int dir, int angle) {

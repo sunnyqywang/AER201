@@ -28,6 +28,7 @@ const int leftTurnSensorPin = A12;
 const int rightTurnSensorPin = A15;
 
 const int hopperLockPin = A6;
+
 const int LEFTSLOWSPEED = 120;
 const int LEFTFASTSPEED = 180;
 const int LEFTNORMALSPEED = 150;
@@ -36,7 +37,7 @@ const int RIGHTFASTSPEED = 180;
 const int RIGHTNORMALSPEED = 150;
 
 const int ARMHORIZONTAL = 15;
-const int SWEEPERCLOSED = 145;
+const int SWEEPERCLOSED = 135;
 const int SWEEPEROPEN = 70;
 
 // Stores the path from starting position to the central hoppers
@@ -64,7 +65,7 @@ const int toBoard[12][8] =
            {0,1,2,2,6,2,3,0},
            {5,2,2,0,0,0,0,0},  
            {0,1,2,2,6,2,3,0},           
-           {6,2,3,0,0,0,0,0},           
+           {6,2,4,0,0,0,0,0},           
            {1,1,2,2,6,2,3,0},
            {6,2,3,0,0,0,0,0},           
            {1,1,1,2,6,2,2,0}};

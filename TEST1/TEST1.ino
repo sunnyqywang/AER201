@@ -1,3 +1,6 @@
+// Notes:
+// This version includes multiple tries in getting into the hopper 
+
 #include <Servo.h>
 #include <Arduino.h>
 #include <Keypad.h>
@@ -10,6 +13,7 @@
 Servo mySweeper;
 Servo myArm;
 int index, hopper;
+int successApproach = false;
 int firstTime = true;
 
 int EnterHopperPosition () {
@@ -107,20 +111,26 @@ void loop() {
   OpenSweeper();
   
   Serial.println("Arm and Sweeper ready");
-  delay(500);
+  delay(1000);
   
   // 4. Go in hopper
-  ApproachHopper(toHopper[hopper][index], toHopper[hopper][index+1]);
-
+  
+  successApproach = ApproachHopper(toHopper[hopper][index], toHopper[hopper][index+1]);
+  
+  while (!successApproach) {
+      ExitHopper(toHopper[hopper][index], toHopper[hopper][index+1]); 
+      delay(500);
+      successApproach = ApproachHopper(toHopper[hopper][index], toHopper[hopper][index+1]);
+  }
   Serial.println("Inside Hopper, ready to catch");
-  delay(300);
+  delay(1000);
   
   // 5. Close Sweeper
   
   CloseSweeper();
   
   Serial.print("Got the ball");
-  delay(300);
+  delay(1000);
  
   // 6. Go back to hopper intersection
   //    Reverse the actions when going in the hoppers
@@ -128,13 +138,14 @@ void loop() {
   ExitHopper(toHopper[hopper][index], toHopper[hopper][index+1]); 
 
   Serial.println("Back to hopper intersection");
+  delay(1000);
  
   // 7. Lift arm halfway
   
   LiftArmHalfWay();
   
   Serial.println("Arm lifted, Ready to go");
-  delay(500);
+  delay(1000);
  
   // 8. Go to gameboard
   index = 0;
@@ -151,16 +162,16 @@ void loop() {
   StopMotors();
   
   Serial.println("Arrived at the game board, ready to drop");
-  delay(500);
+  delay(1000);
   
   // 9. Lift arm all the way to deposit the ball
   
   ArmAllTheWay();
-  delay(500);
+  delay(1000);
   DropArmHalfWay();
   
   Serial.println("Done! Did the ball go in? Am I good? Go ahead and compliment me!");
-  delay(1000);
+  delay(200000000);
   
 }
 

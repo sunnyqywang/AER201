@@ -73,6 +73,7 @@ void Turn(int dir) {
     int state = 10;
     int leftdone = 0;
     int rightdone = 0;
+    unsigned long time;
     
     StopMotors();
     
@@ -92,6 +93,7 @@ void Turn(int dir) {
     }
     
     StartMotors();
+    time = millis();
     
     // Approximate turning time needed
     delay(1000);
@@ -116,6 +118,8 @@ void Turn(int dir) {
         }
         
         if ((state == 2) or (leftdone && rightdone)){
+            turnTime = millis() - time;
+            Serial.println(turnTime);
             StopMotors();
             Serial.println("Both done");
             break;
