@@ -10,7 +10,7 @@
 #include <Arduino.h>
 #include "Data.h"
 
-void WallFollow(int expectedDuration) {
+void CheckUltrasonic(int expectedDuration) {
         
     pinMode(UltrasonictrigPin, OUTPUT);
     digitalWrite(UltrasonictrigPin,LOW);

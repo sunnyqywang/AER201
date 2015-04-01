@@ -103,7 +103,7 @@ void ExitHopper(int dir, int angle) {
             maxTime = 350;
             break;
         case 30:
-            maxTime = 450;
+            maxTime = 800;
             break;
         case 45:
             maxTime = 1200;
@@ -112,9 +112,10 @@ void ExitHopper(int dir, int angle) {
             break;
     } 
     time = millis();
-    updatedTime = millis();
+    updatedTime = millis();//
     
     while (updatedTime - time < maxTime) {
+//    while(true) {
         state = CheckSensors(2);
         
         Serial.println(state);

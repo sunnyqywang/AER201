@@ -15,6 +15,8 @@
 unsigned long time;
 unsigned long timeElapsed;
 
+extern unsigned long turnTime;
+
 int ApproachHopper(int dir, int angle) {
     
     int HopperLock = 0;
@@ -72,6 +74,7 @@ int ApproachHopper(int dir, int angle) {
     }
 }
 
+
 void ExitHopper(int dir, int angle) {
     
     int state = 10;
@@ -80,63 +83,140 @@ void ExitHopper(int dir, int angle) {
     unsigned long time = 0;
     unsigned long updatedTime = 0;
     unsigned long maxTime;
+    int dir1 = dir;
     
     BackwardMotion();
     StartMotors();
     delay(timeElapsed+100);
+    StopMotors();
     
-    switch (dir) {
-        case 1:
-            TurningRight();
-            break;
-            
-        case 2:
-            TurningLeft();
-            break;
-            
-        default:
-            break;
-    }
-     
-     switch (angle) {
+    // Reposition LEFT side to align with the line
+    switch (angle) {
         case 15:
             maxTime = 350;
             break;
         case 30:
-            maxTime = 450;
+            maxTime = 800;
             break;
         case 45:
-            maxTime = 1200;
+            maxTime = 1000;
             break;
         default:
             break;
-    } 
-    time = millis();
-    updatedTime = millis();
-    
-    while (updatedTime - time < maxTime) {
-        state = CheckSensors(2);
-        
-        Serial.println(state);
-        
-        if (state == -1){
-          Serial.println("Left done");
-          leftdone = 1;
-          analogWrite(leftMotorEnablePin, 0);
-        }
-        
-        if (state == 1){
-          Serial.println("Right done");
-          rightdone = 1;
-          analogWrite(rightMotorEnablePin, 0);
-        }
-        
-        if ((state == 2) or (leftdone && rightdone)){
-            StopMotors();
-            Serial.println("Both done");
-            break;
-        }
-        updatedTime = millis();
     }
+    
+    int done = false;
+    
+    while (!done) {
+        
+        switch (dir1) {
+            case 1:
+                TurningRight();
+                break;
+                
+            case 2:
+                TurningLeft();
+                break;
+                
+            default:
+                break;
+        }
+        
+        analogWrite(rightMotorEnablePin, 0);
+        analogWrite(leftMotorEnablePin, LEFTNORMALSPEED);
+        
+        time = millis();
+        updatedTime = millis();
+        
+        while (updatedTime - time < maxTime) {
+
+            state = CheckSensors(2);
+            
+            Serial.println(state);
+            
+            if (state == -1){
+                analogWrite(leftMotorEnablePin, 0);
+                done = true;
+                break;
+            }
+            
+            updatedTime = millis();
+        }
+        
+        maxTime += 200;
+        
+        if (dir1 == 1) {
+            dir1 = 2;
+        } else {
+            dir1 = 1;
+        }
+
+    }
+    Serial.println("Leftdone");
+    
+    
+    // Reposition RIGHT side to align with the line
+    switch (angle) {
+        case 15:
+            maxTime = 350;
+            break;
+        case 30:
+            maxTime = 800;
+            break;
+        case 45:
+            maxTime = 1000;
+            break;
+        default:
+            break;
+    }
+    
+    done = false;
+    while (!done) {
+        
+        switch (dir1) {
+            case 1:
+                TurningLeft();
+                break;
+                
+            case 2:
+                TurningRight();
+                break;
+                
+            default:
+                break;
+        }
+        
+        analogWrite(leftMotorEnablePin,0);
+        analogWrite(rightMotorEnablePin,RIGHTNORMALSPEED);
+        
+        time = millis();
+        updatedTime = millis();
+        
+        while (updatedTime - time < maxTime) {
+        //while (true) {
+            state = CheckSensors(2);
+            
+            Serial.println(state);
+            
+            if (state == 1){
+                analogWrite(rightMotorEnablePin, 0);
+                done = true;
+                break;
+            }
+            
+            updatedTime = millis();
+        }
+        
+        maxTime += 200;
+        
+        if (dir1 == 1) {
+            dir1 = 2;
+        } else {
+            dir1 = 1;
+        }
+        
+    }
+    Serial.println("Rightdone");
     StopMotors();
+  
 }

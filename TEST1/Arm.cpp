@@ -21,7 +21,7 @@ void LiftArmHalfWay() {
     delay(200);
     myArm.write(ARMHORIZONTAL+50);
     delay(200);
-    myArm.write(ARMHORIZONTAL+60);
+    myArm.write(ARMHORIZONTAL+63);
 
 }
 
@@ -31,7 +31,7 @@ void DropArmHalfWay() {
   delay(400);
   myArm.write(ARMHORIZONTAL+75);
   delay(400);
-  myArm.write(ARMHORIZONTAL+60);
+  myArm.write(ARMHORIZONTAL+63);
   
 }
 
@@ -51,12 +51,10 @@ void ArmDrop() {
 
 void ArmAllTheWay() {
     
-    myArm.write(ARMHORIZONTAL+60);
-    delay(500);
+    myArm.write(ARMHORIZONTAL+63);
+    delay(200);
     myArm.write(ARMHORIZONTAL+75);
-    delay(500);
-    myArm.write(ARMHORIZONTAL+80);
-    delay(500);
+    delay(200);
     myArm.write(ARMHORIZONTAL+85);
     
 }

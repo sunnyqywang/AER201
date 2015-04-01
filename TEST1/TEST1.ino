@@ -76,21 +76,28 @@ void setup() {
 }
   
 void loop() {
-
-  // 0. Check if it's the first run
-  if (!firstTime) {
-      LineFollow(BOARDTOSTART[0], BOARDTOSTART[1]);
-      LineFollow(BOARDTOSTART[2], BOARDTOSTART[3]);
-      LineFollow(BOARDTOSTART[4], BOARDTOSTART[5]);
-      LineFollow(BOARDTOSTART[6], BOARDTOSTART[7]);
-      LineFollow(BOARDTOSTART[8], BOARDTOSTART[9]);
-      firstTime = false;
-  }
   
-  // 1. Set hopper number, initialize arm and sweeper
+  // 0. Set hopper number, initialize arm and sweeper
   
   LiftArmHalfWay();
   CloseSweeper();
+  
+  // 1. Check if it's the first run
+  if (!firstTime) {
+//      LineFollow(BOARDTOSTART[0], BOARDTOSTART[1]);
+//      LineFollow(BOARDTOSTART[2], BOARDTOSTART[3]);
+//      LineFollow(BOARDTOSTART[4], BOARDTOSTART[5]);
+//      LineFollow(BOARDTOSTART[6], BOARDTOSTART[7]);
+//      LineFollow(BOARDTOSTART[8], BOARDTOSTART[9]);
+      
+      LineFollow(3, 2);
+      LineFollow(6, 2);
+      LineFollow(1, 1);
+      LineFollow(1, 2);
+      LineFollow(1, 0);
+  } else {
+      firstTime = false;
+  }
 
   // 2. Going to the hopper intersection
   index = 0;
@@ -114,7 +121,7 @@ void loop() {
   delay(1000);
   
   // 4. Go in hopper
-  
+  index = 8;
   successApproach = ApproachHopper(toHopper[hopper][index], toHopper[hopper][index+1]);
   
   while (!successApproach) {
@@ -149,7 +156,7 @@ void loop() {
  
   // 8. Go to gameboard
   index = 0;
-  while (index < 7) {
+  while (index <11) {
     
     if (toBoard[hopper][index] == 0 && toBoard[hopper][index+1] != 0)
       Turn(toBoard[hopper][index+1]);
@@ -166,12 +173,27 @@ void loop() {
   
   // 9. Lift arm all the way to deposit the ball
   
+  TurningLeft();
+  StartMotors();
+  delay(175);
+  StopMotors();
+  
+  myArm.write(ARMHORIZONTAL+50);
+
+  OpenSweeper();
+  delay(200);
   ArmAllTheWay();
   delay(1000);
+  
   DropArmHalfWay();
+  TurningRight();
+  StartMotors();
+  delay(175);
+  StopMotors();
+  delay(500);
   
   Serial.println("Done! Did the ball go in? Am I good? Go ahead and compliment me!");
-  delay(200000000);
+  delay(1000);
   
 }
 

@@ -25,23 +25,8 @@ void loop() {
 //      Serial.println("go");
 //      break;
 //  }
-  Serial.print("IR:");
-  switch (ir) {
-    case -1:
-      Serial.println("left touch");
-      break;
-    case 1:
-      Serial.println("right touch");
-      break;
-    case 2: 
-      Serial.println("intersection");
-      break;
-    default:
-      Serial.println("go");
-      break;
-  }
-//  Serial.print("Turn:");
-//  switch (turn) {
+//  Serial.print("IR:");
+//  switch (ir) {
 //    case -1:
 //      Serial.println("left touch");
 //      break;
@@ -55,6 +40,21 @@ void loop() {
 //      Serial.println("go");
 //      break;
 //  }
+  Serial.print("Turn:");
+  switch (turn) {
+    case -1:
+      Serial.println("left touch");
+      break;
+    case 1:
+      Serial.println("right touch");
+      break;
+    case 2: 
+      Serial.println("intersection");
+      break;
+    default:
+      Serial.println("go");
+      break;
+  }
   
 }
 

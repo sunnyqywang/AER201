@@ -137,15 +137,15 @@ int CheckSensors(int type) {
         rightSensorMapped = map(rightSensor, minTurnRight, maxTurnRight, 0, 100);
     }
     
-    if ((leftSensorMapped > 50) and (rightSensorMapped < 50)) 
+    if ((leftSensorMapped > 30) and (rightSensorMapped < 30)) 
         // left sensor touches the line while right sensor stays in
         return -1;
         
-    if ((rightSensorMapped > 50) and (leftSensorMapped < 50))
+    if ((rightSensorMapped > 30) and (leftSensorMapped < 30))
         // right sensor touches the line while left sensor stays in
         return 1;
         
-    if ((leftSensorMapped > 50) and (rightSensorMapped > 50))
+    if ((leftSensorMapped > 30) and (rightSensorMapped > 30))
         // both sensors touch the line -> intersection
         return 2;
         
