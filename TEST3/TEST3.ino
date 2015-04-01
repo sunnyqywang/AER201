@@ -1,6 +1,11 @@
 // Notes:
-// This version includes multiple tries in getting into the hopper 
-// This version also includes getting back to intersection separately
+// This version includes getting back to intersection separately
+// This version includes ultrasonic sensor
+
+// Check ULTRAONEGRIDPOINT, ULTRATHRESHOLD, ADJUSTTIME
+// adjustments should be smaller than threshold
+// threshold should be within line following tolerance
+// Check Ultrasonic Pins
 
 #include <Servo.h>
 #include <Arduino.h>
@@ -145,9 +150,10 @@ void loop() {
 
   ExitHopper(2, 30); 
   // ExitHopper(toHopper[hopper][index], toHopper[hopper][index+1]); 
+  AdjustPosition();
 
   Serial.println("Back to hopper intersection");
-  delay(10000000);
+  delay(1000);
  
   // 7. Lift arm halfway
   

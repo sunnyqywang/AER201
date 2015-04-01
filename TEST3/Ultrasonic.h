@@ -11,6 +11,6 @@
 
 #include <stdio.h>
 
-void CheckPulse(int);
+int CheckUltrasonic(int);
 
 #endif /* defined(____Ultrasonic__) */
