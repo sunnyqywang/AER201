@@ -1,6 +1,6 @@
 int duration;
-  const int UltrasonicechoPin = 11;
-  const int UltrasonictrigPin = 12;
+  const int UltrasonicechoPin = 31;
+  const int UltrasonictrigPin = 30;
 void setup() {
   
   Serial.begin(9600);

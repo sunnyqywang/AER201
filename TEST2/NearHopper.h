@@ -12,6 +12,6 @@
 #include <stdio.h>
 
 int ApproachHopper(int, int);
-void ExitHopper(int, int);
+void ExitHopper(int, int, int);
 
 #endif /* defined(____NearHopper__) */

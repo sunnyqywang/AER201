@@ -11,12 +11,9 @@
 #include "GridFollowing.h"
 #include "Data.h"
 #include "Sensors.h"
-#include "Ultrasonic.h"
 
 unsigned long time;
 unsigned long timeElapsed;
-
-extern unsigned long turnTime;
 
 int ApproachHopper(int dir, int angle) {
     
@@ -38,11 +35,14 @@ int ApproachHopper(int dir, int angle) {
     StartMotors();
     
     switch (angle) {
+        case 5:
+            delay(65);
+            break;
         case 15:
-            delay(250);
+            delay(240);
             break;
         case 30:
-            delay(700);
+            delay(650);
             break;
         case 45:
             delay(1000);
@@ -60,11 +60,10 @@ int ApproachHopper(int dir, int angle) {
     while (HopperLock == 0) {
         
         HopperLock = digitalRead(A6);
-        if (millis() - time > 2500) 
+        if (millis() - time > 3000) 
            break; 
            
     }
-    
     StopMotors();
     
     if (HopperLock == 1) {
@@ -74,200 +73,16 @@ int ApproachHopper(int dir, int angle) {
       timeElapsed = 2000;
       return 0;
     }
-    
 }
 
-
-void ExitHopper(int dir, int angle) {
-    
-    int state = 10;
-    int leftdone = 0;
-    int rightdone = 0;
-    unsigned long time = 0;
-    unsigned long updatedTime = 0;
-    unsigned long maxTime;
-    int dir1 = dir;
+void ExitHopper(int dir, int angle, int hopper) {
     
     BackwardMotion();
+    
     StartMotors();
-    delay(timeElapsed+100);
+    
+    delay(1800);
+    
     StopMotors();
-    
-    // Reposition LEFT side to align with the line
-    switch (angle) {
-        case 15:
-            maxTime = 350;
-            break;
-        case 30:
-            maxTime = 800;
-            break;
-        case 45:
-            maxTime = 1000;
-            break;
-        default:
-            break;
-    }
-    
-    int done = false;
-    
-    while (!done) {
-        
-        switch (dir1) {
-            case 1:
-                TurningRight();
-                break;
-                
-            case 2:
-                TurningLeft();
-                break;
-                
-            default:
-                break;
-        }
-        
-        analogWrite(rightMotorEnablePin, 0);
-        analogWrite(leftMotorEnablePin, LEFTNORMALSPEED);
-        
-        time = millis();
-        updatedTime = millis();
-        
-        while (updatedTime - time < maxTime) {
-
-            state = CheckSensors(2);
-            
-            Serial.println(state);
-            
-            if (state == -1){
-                analogWrite(leftMotorEnablePin, 0);
-                done = true;
-                break;
-            }
-            
-            updatedTime = millis();
-        }
-        
-        maxTime += 200;
-        
-        if (dir1 == 1) {
-            dir1 = 2;
-        } else {
-            dir1 = 1;
-        }
-
-    }
-    Serial.println("Leftdone");
-    
-    
-    // Reposition RIGHT side to align with the line
-    switch (angle) {
-        case 15:
-            maxTime = 350;
-            break;
-        case 30:
-            maxTime = 800;
-            break;
-        case 45:
-            maxTime = 1000;
-            break;
-        default:
-            break;
-    }
-    
-    done = false;
-    while (!done) {
-        
-        switch (dir1) {
-            case 1:
-                TurningLeft();
-                break;
-                
-            case 2:
-                TurningRight();
-                break;
-                
-            default:
-                break;
-        }
-        
-        analogWrite(leftMotorEnablePin,0);
-        analogWrite(rightMotorEnablePin,RIGHTNORMALSPEED);
-        
-        time = millis();
-        updatedTime = millis();
-        
-        while (updatedTime - time < maxTime) {
-            
-            state = CheckSensors(2);
-            
-            Serial.println(state);
-            
-            if (state == 1){
-                analogWrite(rightMotorEnablePin, 0);
-                done = true;
-                break;
-            }
-            
-            updatedTime = millis();
-        }
-        
-        maxTime += 200;
-        
-        if (dir1 == 1) {
-            dir1 = 2;
-        } else {
-            dir1 = 1;
-        }
-        
-    }
-    Serial.println("Rightdone");
-  
 }
 
-void AdjustPosition() {
-    
-    int state;
-    
-    while (true) {
-        
-        state = CheckUltrasonic(ULTRAONEGRIDPOINT);
-        
-        switch (state) {
-            case -1:
-            // Too close to the wall
-                
-                TurningLeft();
-                analogWrite(leftMotorEnablePin, LEFTNORMALSPEED);
-                analogWrite(rightMotorEnablePin, 0);
-                delay(ADJUSTTIME);
-                
-                TurningRight();
-                analogWrite(leftMotorEnablePin, 0);
-                analogWrite(rightMotorEnablePin, RIGHTNORMALSPEED);
-                delay(ADJUSTTIME);
-                
-                break;
-                
-            case 1:
-            // Too far from the wall
-                
-                TurningRight();
-                analogWrite(leftMotorEnablePin, 0);
-                analogWrite(rightMotorEnablePin, RIGHTNORMALSPEED);
-                delay(ADJUSTTIME);
-                
-                TurningLeft();
-                analogWrite(leftMotorEnablePin, LEFTNORMALSPEED);
-                analogWrite(rightMotorEnablePin, 0);
-                delay(ADJUSTTIME);
-                
-                break;
-                
-            default:
-                return;
-                break;
-        }
-        
-        LineFollow(1,0);
-    }
-    
-}

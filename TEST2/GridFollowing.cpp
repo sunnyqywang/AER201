@@ -28,8 +28,6 @@ void BackwardMotion() {
   digitalWrite(leftMotorCtrlPin2, HIGH);
   digitalWrite(rightMotorCtrlPin1, LOW);
   digitalWrite(rightMotorCtrlPin2, HIGH);
-//  analogWrite(leftMotorEnablePin, LEFTNORMALSPEED);
-//  analogWrite(rightMotorEnablePin, RIGHTNORMALSPEED);
   
 }
 
@@ -138,7 +136,7 @@ void LineFollow(int dist, int dir) {
     
     while (true) {
       
-        if (millis()-inttime > 1000) {
+        if (millis()-inttime > 500) {
           turnInst = CheckSensors(2);
           
           if (turnInst == 2 or (leftintersect == 1 && rightintersect == 1)) {
@@ -158,6 +156,8 @@ void LineFollow(int dist, int dir) {
                   // restore forward motion before returning
                   ForwardMotion();
                   return;
+              } else {
+                  StartMotors();
               }
           } else if (turnInst == -1) {
               analogWrite(leftMotorEnablePin, 0);

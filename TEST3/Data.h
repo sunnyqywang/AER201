@@ -29,44 +29,37 @@ const int rightTurnSensorPin = A15;
 
 const int hopperLockPin = A6;
 
-const int UltrasonicTrigPin = 30;
-const int UltrasonicEchoPin = 31;
+const int LEFTSLOWSPEED = 90;
+const int LEFTFASTSPEED = 170;
+const int LEFTNORMALSPEED = 200;
 
-const int LEFTSLOWSPEED = 120;
-const int LEFTFASTSPEED = 180;
-const int LEFTNORMALSPEED = 150;
-
-const int RIGHTSLOWSPEED = 120;
-const int RIGHTFASTSPEED = 180;
-const int RIGHTNORMALSPEED = 150;
+const int RIGHTSLOWSPEED = 80;
+const int RIGHTFASTSPEED = 160;
+const int RIGHTNORMALSPEED = 190;
 
 const int ARMHORIZONTAL = 0;
 const int SWEEPERCLOSED = 95;
 const int SWEEPEROPEN = 20;
 
-const int ULTRAONEGRIDPOINT = 1000;
-const int ULTRATHRESHOLD = 50;
-
-const int ADJUSTTIME = 200;
-
 // Stores the path from starting position to the central hoppers
-// dist, dir, dist, dir
 const int toHopper[12][10] = 
           {{2,2,1,1,1,2,2,0,2,30},
            {2,2,2,0,2,15,0,0,0,0},
            {2,2,3,0,2,30,0,0,0,0},
-           {1,2,2,0,2,15,0,0,0,0},
-           {2,2,1,1,1,2,1,0,2,45},
-           {1,2,1,0,1,15,0,0,0,0},       
-           {2,2,2,0,2,45,0,0,0,0},
-           {1,2,1,0,2,15,0,0,0,0},          
-           {2,2,1,1,1,2,2,45,0,0},          
+           
+           {1,2,2,0,2,5,0,0,0,0},
+           {2,2,1,1,1,2,1,0,2,30},
+           {1,2,1,0,1,5,0,0,0,0},  
+           
+           {2,2,2,0,2,30,0,0,0,0},
+           {1,2,1,0,2,5,0,0,0,0},          
+           {2,2,1,1,1,2,2,30,0,0}, 
+           
            {1,2,1,15,0,0,0,0,0,0},
            {2,2,1,0,2,45,0,0,0,0},
-           {1,2,2,15,0,0,0,0,0,0}};
+           {1,2,2,5,0,0,0,0,0,0}};
           
-// Stores the path from the central hoppers to the game board
-// dist, dir, dist, dir
+//Stores the path from the central hoppers to the game board
 const int toBoard[12][12] = 
            {{4,2,3,0,0,0,0,0,0,0,0,0},
            {1,1,1,2,4,2,3,0,0,0,0,0},

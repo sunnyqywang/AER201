@@ -96,8 +96,6 @@ void calibrate() {
     analogWrite(leftMotorEnablePin, 0);
     analogWrite(rightMotorEnablePin, 0);
     
-    delay(3000);
-    
     return;
 }
 
